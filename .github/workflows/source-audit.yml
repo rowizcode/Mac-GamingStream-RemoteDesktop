@@ -1,0 +1,37 @@
+name: Source audit
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject private runtime material
+        shell: bash
+        run: |
+          set -euo pipefail
+          if find . -type f \( -name 'sunshine.conf' -o -name 'sunshine_state.json' -o -name '*.pem' -o -name '*.key' \) -print | grep -q .; then
+            echo 'Private Sunshine runtime material is present.' >&2
+            exit 1
+          fi
+      - name: Validate scripts and property lists
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n scripts/build-macos.sh scripts/install-macos.sh scripts/diagnose-macos.sh
+          plutil -lint hid_entitlements.plist src_assets/macos/build/Info.plist.in
+      - name: Check required macOS source files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f src/platform/macos/input.cpp
+          test -f src/platform/macos/hid_gamepad.h
+          test -f src/platform/macos/hid_gamepad.m
+          test -f src/platform/macos/av_audio.mm
+          test -f third-party/TPCircularBuffer/TPCircularBuffer.c

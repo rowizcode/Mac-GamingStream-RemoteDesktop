@@ -1,0 +1,18 @@
+©2018 Valve Corporation. Steam and the Steam logo are trademarks and/or
+registered trademarks of Valve Corporation in the U.S. and/or other countries. All
+rights reserved.
+
+This macOS-focused derivative contains work based on:
+
+* Sunshine by LizardByte and contributors (GPL-3.0-only)
+  https://github.com/LizardByte/Sunshine
+* Lumen by trollzem and contributors (GPL-3.0-only)
+  https://github.com/trollzem/Lumen
+* Moonlight common code by the Moonlight project
+  https://github.com/moonlight-stream/moonlight-common-c
+* TPCircularBuffer by A Tasty Pixel (zlib-style license; notice retained in
+  third-party/TPCircularBuffer/README.markdown)
+
+The macOS virtual gamepad implementation uses Apple's IOHIDUserDevice APIs and
+restricted HID entitlements. This project is not affiliated with Apple, Valve,
+LizardByte, Moonlight, or trollzem.

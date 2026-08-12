@@ -1,0 +1,34 @@
+# Example only. Merge selected lines into ~/.config/sunshine/sunshine.conf.
+# Never publish the generated credentials, state, certificates, or private keys.
+
+# Capture the currently active physical desktop.
+virtual_display = disabled
+
+# Apple Silicon hardware encoder. Sunshine negotiates H.264/HEVC with Moonlight.
+encoder = videotoolbox
+hevc_mode = 2
+av1_mode = 0
+vt_realtime = 1
+vt_software = 0
+
+# Keep the host uncapped. Moonlight still requests the stream bitrate.
+max_bitrate = 0
+
+# Five percent FEC was stable on the tested LAN; raise it only for packet loss.
+fec_percentage = 5
+
+# Mostly relevant to software encoding, but kept at the tested value.
+min_threads = 3
+
+# Allow keyboard, mouse/touch translation, and controller input.
+keyboard = enabled
+mouse = enabled
+controller = enabled
+gamepad = auto
+
+# Avoid automatic Internet port mapping by default.
+upnp = disabled
+origin_web_ui_allowed = pc
+
+# Start with 60. Moonlight may request 90/120 and the host follows the session.
+minimum_fps_target = 60

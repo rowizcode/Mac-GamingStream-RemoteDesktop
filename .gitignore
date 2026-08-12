@@ -1,0 +1,76 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# JetBrains IDE
+.idea/
+
+# VSCode IDE
+.vscode/
+
+# build directories
+build/
+build-*/
+cmake-*/
+docs/doxyconfig*
+
+# The macOS packaging inputs live in a source directory named "build".
+!src_assets/macos/build/
+!src_assets/macos/build/**
+
+# npm
+node_modules/
+
+# Translations
+*.mo
+*.pot
+
+# Dummy macOS files
+.DS_Store
+._*
+
+# Local runtime data must never be committed.
+sunshine.conf
+sunshine_state.json
+credentials/
+*.pem
+*.key
+*.log
+
+# Local release artifacts.
+dist/
+*.dmg
+*.pkg
+
+# Python
+*.pyc
+venv/
