@@ -24,8 +24,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          bash -n scripts/build-macos.sh scripts/install-macos.sh scripts/diagnose-macos.sh
+          bash -n scripts/build-macos.sh scripts/install-macos.sh scripts/diagnose-macos.sh scripts/package-macos-dmg.sh 'release/Install Sunshine.command'
           plutil -lint hid_entitlements.plist src_assets/macos/build/Info.plist.in
+      - name: Audit and build Web UI
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm audit --audit-level=high
+          npm run build
       - name: Check required macOS source files
         shell: bash
         run: |
@@ -35,3 +42,5 @@ jobs:
           test -f src/platform/macos/hid_gamepad.m
           test -f src/platform/macos/av_audio.mm
           test -f third-party/TPCircularBuffer/TPCircularBuffer.c
+          test -f release/START-HERE.html
+          test -f release/GAMEPAD-SETUP.html

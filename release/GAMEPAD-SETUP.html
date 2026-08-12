@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Optional Gamepad Setup</title>
+  <style>
+    :root { color-scheme: light dark; font: 17px/1.55 -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { max-width: 820px; margin: 48px auto; padding: 0 24px 80px; }
+    h1 { font-size: 2.15rem; line-height: 1.1; }
+    h2 { margin-top: 2.2rem; }
+    li { margin: .6rem 0; }
+    pre { overflow-x: auto; padding: 16px; border-radius: 12px; background: #171717; color: #f4f4f4; }
+    .danger { border: 2px solid #d55245; border-radius: 14px; padding: 18px 22px; }
+  </style>
+</head>
+<body>
+  <h1>Optional virtual gamepad setup</h1>
+  <div class="danger">
+    <strong>Security warning:</strong> This weakens macOS code-integrity protection. Do not do it on a work, banking, or security-sensitive Mac. Sunshine streaming still works without it; only the virtual controller is unavailable.
+  </div>
+
+  <h2>Before you start</h2>
+  <ul>
+    <li>This guide is for Apple Silicon Macs.</li>
+    <li>Back up important files.</li>
+    <li><strong>Do not disable SIP.</strong> This project does not require it.</li>
+    <li>Take a photo of the restore commands near the bottom.</li>
+  </ul>
+
+  <h2>One-time steps</h2>
+  <ol>
+    <li>Shut down the Mac completely.</li>
+    <li>Press and hold the power button until <strong>Loading startup options</strong> appears.</li>
+    <li>Choose <strong>Options → Continue</strong>. Sign in when Recovery asks.</li>
+    <li>From the menu bar, choose <strong>Utilities → Terminal</strong>.</li>
+    <li>Run this command and follow its account/password prompt:</li>
+  </ol>
+  <pre>bputil --disable-boot-args-restriction</pre>
+  <p>This selects Permissive Security for the chosen macOS volume. Apple warns that this makes the system easier to compromise.</p>
+  <ol start="6">
+    <li>Then run:</li>
+  </ol>
+  <pre>nvram boot-args="amfi_get_out_of_my_way=1"</pre>
+  <ol start="7">
+    <li>Restart normally.</li>
+    <li>Run <strong>Install Sunshine.command</strong> again so the app is signed with the required HID entitlement.</li>
+    <li>Connect Moonlight <em>before</em> opening Steam or the game.</li>
+  </ol>
+
+  <h2>Test</h2>
+  <p>Disconnect Moonlight, fully quit the game, reconnect Moonlight with the controller enabled, then launch Steam and the game. The Sunshine log should contain:</p>
+  <pre>IOHIDUserDevice virtual gamepad support is available
+Gamepad 0 allocated (IOHIDUserDevice mode)</pre>
+
+  <h2>Restore the normal security policy</h2>
+  <p>Return to Recovery using the same power-button steps and run:</p>
+  <pre>nvram -d boot-args
+bputil --full-security</pre>
+  <p>Restart normally. The virtual controller will stop working, while video, audio, keyboard, mouse, and touch remain available.</p>
+</body>
+</html>

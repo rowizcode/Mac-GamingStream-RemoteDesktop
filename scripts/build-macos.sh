@@ -88,6 +88,7 @@ export SHOULD_SIGN=false
 cmake -S "$repo_dir" -B "$build_dir" \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_OSX_ARCHITECTURES=arm64 \
+  -DCMAKE_OSX_DEPLOYMENT_TARGET=26.0 \
   -DCMAKE_OSX_SYSROOT="$sdk_path" \
   -DCMAKE_INSTALL_PREFIX="$build_dir/stage" \
   -DBUILD_DOCS=OFF \
@@ -121,7 +122,22 @@ codesign --force --deep --sign - \
   --entitlements "$repo_dir/hid_entitlements.plist" "$output_app"
 codesign --verify --deep --strict --verbose=2 "$output_app"
 
+# Also build the self-contained install tree used by the downloadable DMG.
+# fixup_bundle() copies all non-system dylibs into Contents/Frameworks.
+SHOULD_SIGN=false cmake --install "$build_dir"
+stage_app="$build_dir/stage/Sunshine.app"
+/usr/bin/strip -S "$stage_app/Contents/MacOS/Sunshine"
+if [[ -d "$stage_app/Contents/Frameworks" ]]; then
+  while IFS= read -r -d '' item; do
+    codesign --force --sign - "$item"
+  done < <(find -L "$stage_app/Contents/Frameworks" -type f -perm -111 -print0)
+fi
+codesign --force --deep --sign - \
+  --entitlements "$repo_dir/hid_entitlements.plist" "$stage_app"
+codesign --verify --deep --strict --verbose=2 "$stage_app"
+
 echo
 echo "Built: $output_app"
+echo "Self-contained app: $stage_app"
 echo "SHA-256: $(shasum -a 256 "$output_app/Contents/MacOS/Sunshine" | awk '{print $1}')"
 echo "The build was not launched and did not modify the installed Sunshine app."

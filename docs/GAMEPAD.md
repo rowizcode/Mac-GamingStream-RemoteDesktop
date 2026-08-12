@@ -1,46 +1,60 @@
-# Virtual gamepad and macOS security
+# Optional virtual gamepad setup
 
-## Why this is different from mouse input
+## Read this warning first
 
-Moonlight sends controller packets to Sunshine. On macOS, this project translates
-them into a virtual Xbox-compatible HID device with `IOHIDUserDevice`. Apple
-documents `com.apple.developer.hid.virtual.device` as the entitlement that allows
-an app to create and manage virtual HID devices. It is restricted; an ordinary
-ad-hoc signed app cannot use it on a default-secured Mac.
+Moonlight sends controller packets to Sunshine. This project turns them into a
+system-wide virtual Xbox-compatible controller using `IOHIDUserDevice`. Apple
+restricts this capability with the `com.apple.developer.hid.virtual.device`
+entitlement. An ordinary ad-hoc community build cannot use that entitlement on
+a Mac with the default boot policy.
 
-The tested build uses these entitlements:
+The workaround below disables boot-argument filtering and AMFI enforcement for
+the selected macOS installation. **It makes the Mac easier to compromise. Do not
+use it on a work, banking, production, or security-sensitive Mac.** Keyboard,
+mouse, touch, video, and audio do not need this change.
 
-```text
-com.apple.developer.hid.virtual.device
-com.apple.private.hid.client.event-dispatch
-```
+SIP does **not** need to be disabled. Back up important data before changing a
+startup policy.
 
-## Security decision
+## Apple Silicon Recovery steps
 
-The Lumen project documents using this boot argument for its virtual gamepad:
+1. Shut down the Mac completely.
+2. Press and hold the power button until **Loading startup options** appears.
+3. Select **Options → Continue** and authenticate when requested.
+4. From the Recovery menu bar choose **Utilities → Terminal**.
+5. Run:
 
-```text
-amfi_get_out_of_my_way=1
-```
+   ```bash
+   bputil --disable-boot-args-restriction
+   ```
 
-Setting or removing boot arguments is a security-sensitive Recovery operation.
-This repository intentionally does not automate it. Disabling AMFI weakens macOS
-code-integrity enforcement; do not do it on a machine where that risk is
-unacceptable.
+   Follow the volume/account/password prompts. `bputil` warns that this selects
+   Permissive Security and weakens the system.
 
-The test Mac also had SIP disabled while this fork was developed. Lumen states
-that SIP is not required for its virtual HID backend, so this project does not
-instruct users to disable SIP. The project needs more clean-machine validation.
+6. Run:
 
-## Verify the local state
+   ```bash
+   nvram boot-args="amfi_get_out_of_my_way=1"
+   ```
 
-Run the read-only diagnostic:
+7. Restart normally.
+8. Run `Install Sunshine.command` again. It signs the copied app with the HID
+   entitlements but does not alter NVRAM itself.
+
+If the Mac already contains another required boot argument, do not overwrite it
+blindly. Record the current value with `nvram boot-args` and obtain expert help
+to merge it safely.
+
+## Verify and use the controller
+
+The installer reports whether the running kernel has the AMFI boot argument.
+For a detailed read-only test, run:
 
 ```bash
 ./scripts/diagnose-macos.sh
 ```
 
-The relevant successful log lines are:
+Successful log lines are:
 
 ```text
 macOS Accessibility permission is active
@@ -48,30 +62,31 @@ IOHIDUserDevice virtual gamepad support is available
 Gamepad 0 allocated (IOHIDUserDevice mode)
 ```
 
-`No gamepad input is available` at startup only means no controller has been
-allocated yet. Connect Moonlight with a controller enabled and check the log
-again.
+Use this sequence for Steam and games that cache controller devices:
 
-## Steam-specific test sequence
+1. Fully quit the game and Steam.
+2. Disconnect Moonlight.
+3. Reconnect Moonlight with a physical or on-screen controller enabled.
+4. Confirm `Gamepad 0 allocated` in Sunshine's log.
+5. Start Steam and the game.
 
-1. Fully quit the game.
-2. Disconnect the Moonlight session.
-3. Reconnect Moonlight with the physical or on-screen controller enabled.
-4. Confirm `Gamepad 0 allocated` in the Sunshine log.
-5. Start Steam and then the game.
+The mapping provides both sticks, analog triggers, an eight-way D-pad, Xbox
+A/B/X/Y, shoulders, Menu, View, L3, and R3. Controller touchpads and motion
+sensors are not exposed. Touching the iPhone screen uses Moonlight's mouse/touch
+path, not the controller touchpad path.
 
-Launching the game before Moonlight creates the HID controller can make some
-games cache an empty controller list. Reconnecting is then required.
+## Restore normal security
 
-## Mapping used by this project
+Return to Recovery using the same power-button procedure and run:
 
-- sticks: four unsigned 16-bit HID axes with neutral at `0x8000`;
-- triggers: 10-bit HID axes;
-- D-pad: eight-way hat switch;
-- face buttons: Xbox A/B/X/Y order;
-- shoulders, Menu, View, L3, and R3: standard button positions;
-- Moonlight controller slots: `globalIndex` is used directly.
+```bash
+nvram -d boot-args
+bputil --full-security
+```
 
-Controller touchpads and motion sensors are not exposed by this Xbox-compatible
-profile. Touch gestures on the iPhone screen are translated through Moonlight's
-mouse/touch path, not the gamepad touchpad path.
+Restart normally. The virtual controller will no longer work, while video,
+audio, keyboard, mouse, and touch continue to work.
+
+The `nvram -d boot-args` command removes **all** boot arguments. If the Mac had
+other required boot arguments before this project, restore the recorded value
+instead of deleting it.

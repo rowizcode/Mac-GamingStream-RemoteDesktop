@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sunshine Mac Cloud Gaming — Start Here</title>
+  <style>
+    :root { color-scheme: light dark; font: 17px/1.55 -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { max-width: 780px; margin: 48px auto; padding: 0 24px 80px; }
+    h1 { font-size: 2.15rem; line-height: 1.1; }
+    h2 { margin-top: 2.2rem; }
+    li { margin: .55rem 0; }
+    code { padding: .12rem .35rem; border-radius: .3rem; background: color-mix(in srgb, currentColor 10%, transparent); }
+    .box { border: 1px solid color-mix(in srgb, currentColor 25%, transparent); border-radius: 14px; padding: 18px 22px; }
+    .warning { border-left: 5px solid #e39b17; padding-left: 18px; }
+  </style>
+</head>
+<body>
+  <h1>Start here</h1>
+  <p>This package turns an Apple Silicon Mac running macOS 26 or later into a Moonlight streaming host.</p>
+
+  <div class="box">
+    <h2>Install in three steps</h2>
+    <ol>
+      <li>Double-click <strong>Install Sunshine.command</strong>.</li>
+      <li>If macOS blocks it, Control-click it, choose <strong>Open</strong>, then choose <strong>Open</strong> again.</li>
+      <li>Follow the installer. Turn Sunshine on under both Accessibility and Screen &amp; System Audio Recording.</li>
+    </ol>
+  </div>
+
+  <h2>Pair the iPhone or iPad</h2>
+  <ol>
+    <li>Install <strong>Moonlight Game Streaming</strong> from the App Store.</li>
+    <li>Keep the iPhone/iPad and Mac on the same home network for the first pairing.</li>
+    <li>Open Moonlight. Tap the Mac. A PIN appears on the phone.</li>
+    <li>On the Mac, open <code>https://localhost:47990</code>, sign in, choose <strong>PIN</strong>, and enter that PIN.</li>
+    <li>In Moonlight, open <strong>Desktop</strong> to control the Mac's current physical desktop.</li>
+  </ol>
+
+  <h2>Recommended Moonlight settings</h2>
+  <ul>
+    <li>Begin with <strong>1920 × 1080, 60 FPS, H.264, 30–50 Mbps</strong>.</li>
+    <li>After it is stable, try HEVC and 60–70 Mbps for better image quality.</li>
+    <li>Use 90/120 FPS only when the Mac display, the game, and the iPhone all support it.</li>
+    <li>For touch control: one-finger tap = left click; two-finger drag = scroll; long press then drag = click and drag.</li>
+  </ul>
+
+  <h2>Controller support</h2>
+  <p>Video, audio, keyboard, mouse, and touch work without changing startup security. The virtual Xbox controller needs one optional Recovery-mode change. Read <strong>GAMEPAD-SETUP.html</strong> before deciding.</p>
+
+  <h2>Good to know</h2>
+  <ul>
+    <li>The installer keeps existing Sunshine credentials, pairing data, and configuration.</li>
+    <li>It backs up the previous app and enables Sunshine after user login.</li>
+    <li>FileVault's pre-login screen cannot be remotely controlled. Log in to the Mac once after a restart.</li>
+    <li>The Web UI certificate is local/self-signed, so a browser warning at <code>localhost</code> is expected.</li>
+  </ul>
+
+  <p class="warning"><strong>Experimental:</strong> This is an ad-hoc signed, non-notarized community build. It is not an official Sunshine or Lumen release.</p>
+</body>
+</html>

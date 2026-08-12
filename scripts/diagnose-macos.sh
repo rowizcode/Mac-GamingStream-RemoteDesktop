@@ -33,7 +33,11 @@ lsof -nP -iTCP:47990 -sTCP:LISTEN 2>/dev/null || true
 echo
 echo "== Relevant recent log lines =="
 if [[ -f "$log_file" ]]; then
-  grep -E 'Accessibility|IOHIDUserDevice|Gamepad|Found (H\.264|HEVC)|Creating encoder|virtual display' "$log_file" | tail -n 120
+  if command -v rg >/dev/null 2>&1; then
+    rg 'Accessibility|IOHIDUserDevice|Gamepad|Found (H\.264|HEVC)|Creating encoder|virtual display' "$log_file" | tail -n 120
+  else
+    grep -E 'Accessibility|IOHIDUserDevice|Gamepad|Found (H\.264|HEVC)|Creating encoder|virtual display' "$log_file" | tail -n 120
+  fi
 else
   echo "No log found at $log_file"
 fi

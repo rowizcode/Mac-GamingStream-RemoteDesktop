@@ -1,116 +1,129 @@
 # Sunshine Mac Cloud Gaming
 
-An experimental Sunshine derivative for turning an Apple Silicon Mac into a
-low-latency Moonlight host. It packages the macOS work that was tested on an M4
-Mac mini: native screen/system-audio capture, VideoToolbox H.264/HEVC encoding,
-remote keyboard/mouse input, and an Xbox-compatible virtual gamepad.
+Turn an Apple Silicon Mac into a low-latency Moonlight host. This experimental
+Sunshine derivative streams the Mac's **current physical desktop**, system
+audio, keyboard/mouse/touch input, and—after an optional security step—a virtual
+Xbox-compatible controller.
 
-This repository is source code, not an official Sunshine or Lumen release.
-It is derived from [Sunshine](https://github.com/LizardByte/Sunshine) and
-[Lumen](https://github.com/trollzem/Lumen). See [NOTICE](NOTICE) and
-[LICENSE](LICENSE).
+> This is a community build derived from
+> [Sunshine](https://github.com/LizardByte/Sunshine) and
+> [Lumen](https://github.com/trollzem/Lumen). It is not an official release of
+> either project. See [NOTICE](NOTICE) and [LICENSE](LICENSE).
 
-## What works in the tested setup
+## Easiest installation — no Xcode or Homebrew
 
-- Moonlight streams the currently active physical desktop. The default example
-  config deliberately keeps `virtual_display = disabled`.
-- VideoToolbox hardware encoding with H.264 and HEVC, including 60/90/120 FPS
-  client requests when the display and game can sustain them.
-- Native system-audio capture.
-- Relative and absolute mouse movement, clicks, scrolling, and keyboard input.
-- Xbox-compatible virtual HID controller input in Steam games such as Skater XL.
-- Multiple controller slots use Moonlight's `globalIndex`; allocation returns
-  success correctly instead of orphaning all slots after slot 0.
+1. Open [Releases](https://github.com/rowizcode/Sunshine-Mac-Cloud-Gaming/releases/latest).
+2. Download the file ending in **Apple-Silicon.dmg**.
+3. Open the DMG and double-click **Install Sunshine.command**.
+4. If macOS blocks it, Control-click the file, choose **Open**, then **Open**
+   again.
+5. Follow the installer. Enable Sunshine under both permissions it opens:
+   **Accessibility** and **Screen & System Audio Recording**.
+6. Create the Sunshine Web UI account when
+   <https://localhost:47990> opens. The local certificate warning is expected.
 
-## Tested platform
+The installer backs up an existing Sunshine app, preserves
+`~/.config/sunshine`, installs a tested starter configuration only for a new
+setup, and enables Sunshine after user login. It never changes SIP, AMFI, NVRAM,
+or startup security.
 
-- Apple Silicon Mac (tested on M4 Mac mini)
-- macOS 26.6 (build 25G72)
-- Command Line Tools / Apple clang 17
-- Moonlight on iOS
-- Wired Ethernet on the host
+## Connect Moonlight on iPhone or iPad
 
-Other Apple Silicon generations and macOS 14+ may work, but have not yet been
-validated by this project. Intel Macs are not supported by the supplied scripts.
+1. Install **Moonlight Game Streaming** from the App Store.
+2. Keep the iPhone/iPad and Mac on the same home network for the first pairing.
+3. Open Moonlight and tap the Mac. If it does not appear, add the Mac's local IP
+   address manually.
+4. Moonlight shows a PIN. On the Mac, sign in to
+   <https://localhost:47990>, select **PIN**, and enter it.
+5. Open **Desktop** in Moonlight. It shows and controls the physical desktop
+   already visible on the Mac, not a separate virtual screen.
 
-## Important gamepad security warning
+Start with these Moonlight settings:
 
-The virtual controller uses `IOHIDUserDevice` and Apple's restricted
-`com.apple.developer.hid.virtual.device` entitlement. The tested ad-hoc build
-requires AMFI to be disabled with the boot argument
-`amfi_get_out_of_my_way=1`. This reduces an important macOS security layer.
+- 1920 × 1080, 60 FPS;
+- H.264 and 30–50 Mbps while testing;
+- HEVC and 60–70 Mbps after the connection is stable;
+- 90/120 FPS only if the physical display, game, and iPhone can all sustain it.
 
-The scripts in this repository **never change SIP, AMFI, NVRAM, or the startup
-security policy automatically**. Read [docs/GAMEPAD.md](docs/GAMEPAD.md) and make
-that decision yourself. Streaming, audio, keyboard, and mouse can still be used
-without enabling the virtual gamepad.
+On iOS in trackpad mode: one-finger tap clicks, two-finger drag scrolls, and a
+long press followed by a drag performs click-and-drag.
 
-## Quick build
+## Optional controller support
 
-Install Xcode Command Line Tools and Homebrew, then run:
+Streaming, audio, keyboard, mouse, and touch work without changing startup
+security. The virtual controller uses `IOHIDUserDevice` and Apple's restricted
+`com.apple.developer.hid.virtual.device` entitlement. An ad-hoc build requires a
+one-time AMFI/boot-policy change.
+
+**This weakens macOS security. Do not enable it on a work, banking, or otherwise
+security-sensitive Mac. SIP does not need to be disabled.**
+
+Read the complete reversible procedure in
+[docs/GAMEPAD.md](docs/GAMEPAD.md). The short Recovery sequence is:
 
 ```bash
+bputil --disable-boot-args-restriction
+nvram boot-args="amfi_get_out_of_my_way=1"
+```
+
+After restarting, run the installer once more, connect Moonlight before opening
+Steam/the game, and verify the Sunshine log contains `Gamepad 0 allocated`.
+
+Restore the default policy from Recovery with:
+
+```bash
+nvram -d boot-args
+bputil --full-security
+```
+
+## What is included
+
+- ScreenCaptureKit screen and native system-audio capture;
+- VideoToolbox hardware H.264/HEVC encoding;
+- working macOS click, keyboard, scroll, and Moonlight touch translation;
+- Xbox-compatible virtual HID mapping for sticks, triggers, D-pad, A/B/X/Y,
+  shoulders, Menu, View, L3, and R3;
+- support for multiple Moonlight controller slots via `globalIndex`;
+- current physical desktop streaming (`virtual_display = disabled`);
+- an auto-start LaunchAgent and a source audit workflow.
+
+The downloadable DMG requires an Apple Silicon Mac running macOS 26 or later.
+It is tested on an M4 Mac mini running macOS 26.6 with Moonlight on iOS and
+wired Ethernet on the host. Intel Macs are not supported by the supplied
+scripts.
+
+## Build from source
+
+People who only want to use the app should download the DMG. Developers can run:
+
+```bash
+git clone https://github.com/rowizcode/Sunshine-Mac-Cloud-Gaming.git
+cd Sunshine-Mac-Cloud-Gaming
 ./scripts/build-macos.sh --install-deps
+./scripts/package-macos-dmg.sh
 ```
 
-The app is produced at `build-macos/Sunshine.app`. The build uses a pinned
-Apple-Silicon FFmpeg package and verifies its SHA-256 checksum.
+The source build requires Apple Silicon, Xcode Command Line Tools, and Homebrew.
+The generated self-contained DMG appears in `dist/`. The public community DMG is
+ad-hoc signed and not Apple-notarized.
 
-Install it after reviewing the security warning:
+## Help
 
-```bash
-./scripts/install-macos.sh
-```
-
-The installer:
-
-- backs up an existing `/Applications/Sunshine.app`;
-- never deletes or replaces `~/.config/sunshine`;
-- ad-hoc signs the app with the included HID entitlements;
-- optionally installs a per-user LaunchAgent so Sunshine starts after login.
-
-Then grant Sunshine these permissions in System Settings → Privacy & Security:
-
-1. Screen & System Audio Recording
-2. Accessibility
-
-Quit and reopen Sunshine after changing permissions. Open the local web UI at
-<https://localhost:47990>, create credentials, pair Moonlight, and connect to the
-Desktop entry.
-
-## Recommended starting configuration
-
-Copy only the settings you understand from
-[config/sunshine.conf.example](config/sunshine.conf.example). Do not overwrite an
-existing config blindly.
-
-On Moonlight iOS, start with:
-
-- resolution matching the phone or display;
-- 60 FPS while validating the setup, then 90/120 FPS;
-- HEVC on compatible devices, H.264 when minimum latency matters more;
-- a sensible bitrate for the RF environment instead of assuming a speed-test
-  result guarantees low jitter.
-
-Sunshine's `max_bitrate = 0` leaves the host uncapped; the Moonlight bitrate still
-controls the requested stream bitrate.
-
-## Documentation
-
-- [Setup and permissions](docs/SETUP.md)
-- [Virtual gamepad and security](docs/GAMEPAD.md)
+- [Detailed setup](docs/SETUP.md)
+- [Gamepad and Recovery-mode security](docs/GAMEPAD.md)
 - [Performance tuning](docs/PERFORMANCE.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
-- [Architecture and source provenance](docs/ARCHITECTURE.md)
+- [Architecture and provenance](docs/ARCHITECTURE.md)
 
-## Project status
+Before reporting a problem, run the read-only diagnostic:
 
-Experimental. The tested machine has AMFI disabled and, during development, SIP
-was also disabled. Lumen documents that its virtual HID path needs AMFI rather
-than SIP; this repository does not claim SIP is required. Keep backups, review
-the source, and do not deploy this on a Mac that must retain the default security
-posture.
+```bash
+./scripts/diagnose-macos.sh
+```
+
+Do not upload `~/.config/sunshine`; it contains credentials, pairing state, TLS
+keys, logs, and personal app paths.
 
 ## License
 
-GPL-3.0-only. Third-party components keep their own notices and licenses.
+GPL-3.0-only. Third-party components retain their own notices and licenses.
