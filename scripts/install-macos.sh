@@ -167,6 +167,7 @@ if $install_autostart; then
   plutil -create xml1 "$agent_file"
   plutil -insert Label -string dev.lizardbyte.app.Sunshine "$agent_file"
   plutil -insert ProgramArguments -json "[\"/usr/bin/open\",\"$target_app\"]" "$agent_file"
+  plutil -insert AssociatedBundleIdentifiers -json '["dev.lizardbyte.app.Sunshine"]' "$agent_file"
   plutil -insert RunAtLoad -bool true "$agent_file"
   plutil -insert ProcessType -string Interactive "$agent_file"
   launchctl bootout "gui/$(id -u)" "$agent_file" 2>/dev/null || true
@@ -184,13 +185,20 @@ echo "Sunshine will start automatically after this user logs in."
 
 if $interactive; then
   echo
-  echo "STEP 1 OF 3 - Accessibility"
+  echo "STEP 1 OF 4 - Local Network"
+  echo "Allow Sunshine to find Moonlight on the local network."
+  echo "Turn Sunshine ON if it appears in the System Settings window."
+  open 'x-apple.systempreferences:com.apple.preference.security?Privacy_LocalNetwork'
+  read -r -p "Press Return after Local Network access is allowed... " _
+
+  echo
+  echo "STEP 2 OF 4 - Accessibility"
   echo "Turn Sunshine ON in the System Settings window, then return here."
   open 'x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility'
   read -r -p "Press Return after Sunshine is enabled... " _
 
   echo
-  echo "STEP 2 OF 3 - Screen & System Audio Recording"
+  echo "STEP 3 OF 4 - Screen & System Audio Recording"
   echo "Turn Sunshine ON, then return here."
   open 'x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture'
   read -r -p "Press Return after Sunshine is enabled... " _
@@ -201,7 +209,7 @@ if $interactive; then
   sleep 3
 
   echo
-  echo "STEP 3 OF 3 - Create the Web UI account"
+  echo "STEP 4 OF 4 - Create the Web UI account"
   echo "Your browser will open https://localhost:47990."
   echo "The local certificate warning is expected. Create a NEW Sunshine username/password."
   open 'https://localhost:47990'

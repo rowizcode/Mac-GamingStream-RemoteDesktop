@@ -6,7 +6,7 @@ repo_dir="$(cd "${script_dir}/.." && pwd)"
 build_dir="$repo_dir/build-macos"
 stage_app="$build_dir/stage/Sunshine.app"
 dist_dir="$repo_dir/dist"
-version="2026.8.13"
+version="2026.8.14"
 
 if [[ "$(uname -s)" != "Darwin" || "$(uname -m)" != "arm64" ]]; then
   echo "DMG packaging supports Apple Silicon macOS only." >&2

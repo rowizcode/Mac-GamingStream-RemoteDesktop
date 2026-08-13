@@ -80,7 +80,7 @@ if [[ ! -f "$ffmpeg_dir/lib/libavcodec.a" ]]; then
   tar -xzf "$ffmpeg_archive" -C "$ffmpeg_cache"
 fi
 
-export BUILD_VERSION="2026.8.13"
+export BUILD_VERSION="2026.8.14"
 export BRANCH="mac-cloud-gaming"
 export COMMIT="$(git -C "$repo_dir" rev-parse --short HEAD 2>/dev/null || printf source)"
 export SHOULD_SIGN=false

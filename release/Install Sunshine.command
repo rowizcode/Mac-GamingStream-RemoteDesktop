@@ -8,7 +8,7 @@ echo " Sunshine Mac Cloud Gaming - Easy Installer"
 echo "============================================================"
 echo
 echo "This installs Sunshine, keeps existing settings, enables start"
-echo "at login, and guides you through the two macOS permissions."
+echo "at login, and guides you through the three macOS permissions."
 echo
 
 "$release_dir/Support/install-macos.sh" \

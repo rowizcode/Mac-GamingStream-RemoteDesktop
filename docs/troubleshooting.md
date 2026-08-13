@@ -1,5 +1,20 @@
 # Troubleshooting
 
+## The Mac disappears from Moonlight after a macOS update
+
+On macOS 15 and later, Sunshine needs Local Network permission for Bonjour
+discovery. Open System Settings → Privacy & Security → Local Network and turn
+Sunshine on, then quit and reopen Sunshine. The log should contain:
+
+```text
+Successfully registered DNS service.
+```
+
+If Sunshine is missing from the list, install the latest release from this
+repository first. Older builds did not declare the Local Network usage string
+required by newer macOS releases. You can still add the Mac's LAN IP manually
+in Moonlight while troubleshooting discovery.
+
 ## Cursor moves but clicks do not work
 
 Sunshine lacks Accessibility permission. Enable Sunshine in System Settings →

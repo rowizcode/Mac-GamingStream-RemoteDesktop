@@ -17,8 +17,8 @@ Xbox-compatible controller.
 3. Open the DMG and double-click **Install Sunshine.command**.
 4. If macOS blocks it, Control-click the file, choose **Open**, then **Open**
    again.
-5. Follow the installer. Enable Sunshine under both permissions it opens:
-   **Accessibility** and **Screen & System Audio Recording**.
+5. Follow the installer. Allow **Local Network** access, then enable Sunshine
+   under **Accessibility** and **Screen & System Audio Recording**.
 6. Create the Sunshine Web UI account when
    <https://localhost:47990> opens. The local certificate warning is expected.
 
@@ -88,9 +88,9 @@ bputil --full-security
 - an auto-start LaunchAgent and a source audit workflow.
 
 The downloadable DMG requires an Apple Silicon Mac running macOS 26 or later.
-It is tested on an M4 Mac mini running macOS 26.6 with Moonlight on iOS and
-wired Ethernet on the host. Intel Macs are not supported by the supplied
-scripts.
+It is tested on an M4 Mac mini running macOS 26.6 and macOS 27.0 with Moonlight
+on iOS and wired Ethernet on the host. Intel Macs are not supported by the
+supplied scripts.
 
 ## Build from source
 

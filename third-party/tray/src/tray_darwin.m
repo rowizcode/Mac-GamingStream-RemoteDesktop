@@ -7,6 +7,7 @@
 
 // lib includes
 #include <Cocoa/Cocoa.h>
+#include <dispatch/dispatch.h>
 
 // local includes
 #include "tray.h"
@@ -93,12 +94,25 @@ int tray_loop(int blocking) {
   return 0;
 }
 
-void tray_update(struct tray *tray) {
+static void tray_update_on_main_thread(struct tray *tray) {
   NSImage *image = [[NSImage alloc] initWithContentsOfFile:[NSString stringWithUTF8String:tray->icon]];
   NSSize size = NSMakeSize(16, 16);
   [image setSize:NSMakeSize(16, 16)];
   statusItem.button.image = image;
   [statusItem setMenu:_tray_menu(tray->menu)];
+}
+
+void tray_update(struct tray *tray) {
+  // AppKit requires status-item and menu mutations on the main thread.
+  // macOS 27 enforces this by trapping when a streaming worker updates the
+  // tray directly, so synchronously marshal updates to the main queue.
+  if ([NSThread isMainThread]) {
+    tray_update_on_main_thread(tray);
+  } else {
+    dispatch_sync(dispatch_get_main_queue(), ^{
+      tray_update_on_main_thread(tray);
+    });
+  }
 }
 
 void tray_exit(void) {

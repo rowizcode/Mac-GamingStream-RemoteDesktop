@@ -27,6 +27,7 @@ Turn Sunshine on under:
 
 1. **Privacy & Security → Accessibility**
 2. **Privacy & Security → Screen & System Audio Recording**
+3. **Privacy & Security → Local Network** (macOS 15 and later)
 
 The installer restarts Sunshine after the permissions are selected. Mouse
 movement may work without Accessibility, but clicks and keyboard events will
